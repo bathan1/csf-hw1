@@ -586,3 +586,7 @@ void test_to_dec_2(TestObjs *) {
 }
 
 // TODO: implement additional test functions
+
+// Test for unary minus operation (Milestone 1)
+void test_minus
+
