@@ -52,6 +52,8 @@ BigInt BigInt::operator-(const BigInt &rhs) const
 BigInt BigInt::operator-() const
 {
   // TODO: implement
+
+  BigInt
 }
 
 bool BigInt::is_bit_set(unsigned n) const
