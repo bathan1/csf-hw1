@@ -3,34 +3,18 @@
 
 BigInt::BigInt() : magnitude(0), negative(false) {}
 
-BigInt::BigInt(uint64_t val, bool negative) : negative(negative) {
-
-}
-
-BigInt::BigInt(std::initializer_list<uint64_t> vals, bool negative) : magnitude(vals), negative(negative) 
+BigInt::BigInt(uint64_t val, bool negative) : negative(negative) 
 {
-  for (auto i = vals.begin(); i != vals.end(); ++i) {
-    magnitude.push_back(*i);
-  }
-  this->negative = negative;
-
+  magnitude.push_back(val);
 }
 
-BigInt::BigInt(const BigInt &other)
-  // TODO: initialize member variables
-{
+BigInt::BigInt(std::initializer_list<uint64_t> vals, bool negative) : magnitude(vals), negative(negative) {}
 
+BigInt::BigInt(const BigInt &other) : magnitude(other.magnitude), negative(other.negative) {}
 
-}
+BigInt::~BigInt() {}
 
-BigInt::~BigInt()
-{
-}
-
-BigInt &BigInt::operator=(const BigInt &rhs)
-{
-  // TODO: implement
-}
+BigInt &BigInt::operator=(const BigInt &rhs) {}
 
 bool BigInt::is_negative() const
 {
