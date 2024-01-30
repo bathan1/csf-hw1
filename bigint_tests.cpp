@@ -61,6 +61,7 @@ void test_to_hex_2(TestObjs *objs);
 void test_to_dec_1(TestObjs *objs);
 void test_to_dec_2(TestObjs *objs);
 // TODO: declare additional test functions
+void test_minus_operator(TestObjs *objs);
 
 int main(int argc, char **argv) {
   if (argc > 1) {
@@ -97,6 +98,7 @@ int main(int argc, char **argv) {
   TEST(test_to_dec_1);
   TEST(test_to_dec_2);
   // TODO: add calls to TEST for additional test functions
+  TEST(test_minus_operator);
 
   TEST_FINI();
 }
