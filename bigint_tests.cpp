@@ -610,4 +610,3 @@ void test_minus_operator(TestObjs *objs) {
   ASSERT(result5.is_negative());
 
 }
-
