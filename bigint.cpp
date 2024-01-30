@@ -1,5 +1,7 @@
 #include <cassert>
 #include "bigint.h"
+#include <sstream>
+#include <iomanip>
 
 BigInt::BigInt() : magnitude(0), negative(false) {}
 
@@ -77,9 +79,30 @@ int BigInt::compare(const BigInt &rhs) const
   // TODO: implement
 }
 
-std::string BigInt::to_hex() const
+std::string BigInt::to_hex() const // Convert the magnitude (stored as a vector of unint64_t) to hexdec string
 {
-  // TODO: implement
+  // Check is magnitude vector is empty OR if it has one element 0
+  if (magnitude.empty() || (magnitude.size() == 1 && magnitude[0] == 0)) {
+    return "0";
+  }
+
+  // Loop through mag vec in reverse (store endian little-endian format) to construct hex
+  std::stringstream ss;
+  for (auto i = magnitude.rbegin(); i != magnitude.rend(); ++i) {
+    if (i != magnitude.rbegin()) {
+      ss << std::setfill('0') << std::setw(16);
+    }
+    ss << std::hex << *i;
+  }
+
+  std::string result = ss.str();
+  result.erase(0, result.find_first_not_of('0')); // Remove leading 0's
+
+  if (negative && result != "0") {
+    result = "-" + result;
+  }
+
+  return result;
 }
 
 std::string BigInt::to_dec() const

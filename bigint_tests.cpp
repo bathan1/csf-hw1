@@ -587,7 +587,7 @@ void test_to_dec_2(TestObjs *) {
 
 // TODO: implement additional test functions
 
-// Additioanl test for unary minus operation (Milestone 1)
+// Additional test for unary minus operation (Milestone 1)
 void test_minus_operator(TestObjs *objs) {
   BigInt result1 = -objs->zero;
   check_contents(result1, { 0UL });
