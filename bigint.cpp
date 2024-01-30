@@ -18,16 +18,22 @@ BigInt &BigInt::operator=(const BigInt &rhs) {}
 
 bool BigInt::is_negative() const
 {
-  // TODO: implement
+  return negative;
 }
 
-const std::vector<uint64_t> &BigInt::get_bit_vector() const {
-  // TODO: implement
+const std::vector<uint64_t> &BigInt::get_bit_vector() const 
+{
+  return magnitude;
 }
 
 uint64_t BigInt::get_bits(unsigned index) const
 {
-  // TODO: implement
+  if (index >= this->magnitude.size()) 
+  {
+    return 0;
+  }
+
+  return this->magnitude[index];
 }
 
 BigInt BigInt::operator+(const BigInt &rhs) const
