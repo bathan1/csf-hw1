@@ -3,7 +3,7 @@
 #include <sstream>
 #include <iomanip>
 
-BigInt::BigInt() : magnitude(0), negative(false) {}
+BigInt::BigInt() : magnitude({}), negative(false) {}
 
 BigInt::BigInt(uint64_t val, bool negative) : negative(negative) 
 {
