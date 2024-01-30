@@ -587,6 +587,27 @@ void test_to_dec_2(TestObjs *) {
 
 // TODO: implement additional test functions
 
-// Test for unary minus operation (Milestone 1)
-void test_minus
+// Additioanl test for unary minus operation (Milestone 1)
+void test_minus_operator(TestObjs *objs) {
+  BigInt result1 = -objs->zero;
+  check_contents(result1, { 0UL });
+  ASSERT(!result1.is_negative());
+
+  BigInt result2 = -objs->three;
+  check_contents(result2, { 3UL });
+  ASSERT(result2.is_negative());
+
+  BigInt result3 = -objs->negative_three;
+  check_contents(result3, { 3UL });
+  ASSERT(!result3.is_negative());
+
+  BigInt result4 = -objs->two_pow_64;
+  check_contents(result4, { 0UL, 1UL }); //contents should have two elements with secodn element being 1
+  ASSERT(result4.is_negative());
+
+  BigInt result5 = -objs->u64_max;
+  check_contents(result5, { 0xFFFFFFFFFFFFFFFFUL });
+  ASSERT(result5.is_negative());
+
+}
 
