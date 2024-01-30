@@ -54,7 +54,7 @@ BigInt BigInt::operator-() const
   // TODO: implement
 
   BigInt result(*this); //Make a copy of the current BigInt
-  if (!(magnitude.empty() || (magnitude.size() == 1 && magnitude[0] == 0 )))) {
+  if (!(magnitude.empty() || (magnitude.size() == 1 && magnitude[0] == 0 ))) {
     // Negative sign if num not zero
     result.negative = !negative;
   }
