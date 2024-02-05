@@ -62,6 +62,7 @@ void test_to_dec_1(TestObjs *objs);
 void test_to_dec_2(TestObjs *objs);
 // TODO: declare additional test functions
 void test_minus_operator(TestObjs *objs);
+void test_is_bit_set_0(TestObjs *objs);
 
 int main(int argc, char **argv) {
   if (argc > 1) {
@@ -99,6 +100,7 @@ int main(int argc, char **argv) {
   TEST(test_to_dec_2);
   // TODO: add calls to TEST for additional test functions
   TEST(test_minus_operator);
+  TEST(test_is_bit_set_0);
 
   TEST_FINI();
 }
@@ -611,4 +613,24 @@ void test_minus_operator(TestObjs *objs) {
   check_contents(result5, { 0xFFFFFFFFFFFFFFFFUL });
   ASSERT(result5.is_negative());
 
+}
+
+void test_is_bit_set_0(TestObjs *objs) {
+    BigInt zero = objs->zero;
+    check_contents(zero, { 0UL });
+    ASSERT(!zero.is_bit_set(0));
+
+    BigInt one = objs->one;
+    check_contents(one, { 1UL });
+    ASSERT(one.is_bit_set(0));
+
+    BigInt max = objs->u64_max;
+    check_contents(max, { 0xFFFFFFFFFFFFFFFFUL }); 
+    for (int i = 0; i < 64; i++) {
+        ASSERT(max.is_bit_set(i));
+    }
+
+    BigInt two_pow_64 = objs->two_pow_64;
+    check_contents(two_pow_64, { 0UL, 1UL });
+    ASSERT(two_pow_64.is_bit_set(64));
 }

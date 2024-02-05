@@ -1,4 +1,3 @@
-#include <cassert>
 #include "bigint.h"
 #include <sstream>
 #include <iomanip>
@@ -54,7 +53,8 @@ BigInt BigInt::operator-() const
   // TODO: implement
 
   BigInt result(*this); //Make a copy of the current BigInt
-  if (!(magnitude.empty() || (magnitude.size() == 1 && magnitude[0] == 0 ))) {
+  if (!(magnitude.empty() || (magnitude.size() == 1 && magnitude[0] == 0 ))) 
+  {
     // Negative sign if num not zero
     result.negative = !negative;
   }
@@ -63,7 +63,21 @@ BigInt BigInt::operator-() const
 
 bool BigInt::is_bit_set(unsigned n) const
 {
-  // TODO: implement
+    int num_bits = this->magnitude.size() * 64;
+    // Check if the bit is stored in the vector
+    if (n >= num_bits)
+    {
+       return false; 
+    }
+
+    // Next we figure out which index in the vector
+    // holds the nth bit and get the decimal value at that index.
+    int vector_index = n / 64;
+    uint64_t dec_value = this->magnitude[vector_index];
+    int binary_index = n % 64;
+    uint64_t compare_bitstring = 1ULL << binary_index;
+
+    return (dec_value & compare_bitstring) != 0;
 }
 
 BigInt BigInt::operator<<(unsigned n) const
@@ -95,8 +109,10 @@ std::string BigInt::to_hex() const // Convert the magnitude (stored as a vector 
 
   // Loop through mag vec in reverse (store endian little-endian format) to construct hex
   std::stringstream ss;
-  for (auto i = magnitude.rbegin(); i != magnitude.rend(); ++i) {
-    if (i != magnitude.rbegin()) {
+  for (auto i = magnitude.rbegin(); i != magnitude.rend(); ++i) 
+  {
+    if (i != magnitude.rbegin()) 
+    {
       ss << std::setfill('0') << std::setw(16);
     }
     ss << std::hex << *i;
@@ -105,7 +121,8 @@ std::string BigInt::to_hex() const // Convert the magnitude (stored as a vector 
   std::string result = ss.str();
   result.erase(0, result.find_first_not_of('0')); // Remove leading 0's
 
-  if (negative && result != "0") {
+  if (negative && result != "0") 
+  {
     result = "-" + result;
   }
 
