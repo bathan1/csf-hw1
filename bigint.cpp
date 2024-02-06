@@ -19,37 +19,42 @@ BigInt &BigInt::operator=(const BigInt &rhs) {}
 
 bool BigInt::is_negative() const
 {
-  return negative;
+    return negative;
 }
 
 const std::vector<uint64_t> &BigInt::get_bit_vector() const 
 {
-  return magnitude;
+    return magnitude;
 }
 
 uint64_t BigInt::get_bits(unsigned index) const
 {
-  if (index >= this->magnitude.size()) 
-  {
-    return 0;
-  }
+    if (index >= this->magnitude.size()) 
+    {
+        return 0;
+    }
 
-  return this->magnitude[index];
+    return this->magnitude[index];
 }
 
 
 BigInt BigInt::operator+(const BigInt &rhs) const
 {
-   BigInt result;
-  // Handles cases where operands have different signs
-  if (this->negative != rhs.negative) {
-    if (this->compareMagnitudes(rhs) >= 0) {
+    BigInt result;
+    // Handles cases where operands have different signs
+    if (this->negative != rhs.negative) 
+    {
+        if (this->compare_magnitudes(rhs) >= 0) 
+        {
             // If *this larger or equal magnitude, subtract rhs magnitude from *this magnitude
-            result = this->subtractMagnitudes(rhs);
+            result = this->subtract_magnitudes(rhs);
             result.negative = this->negative; 
-        } else {
+            
+        } 
+        else 
+        {
             // If rhs larger magnitude, subtract *this magnitude from rhs magnitude
-            result = rhs.subtractMagnitudes(*this);
+            result = rhs.subtract_magnitudes(*this);
             result.negative = rhs.negative; 
         }
         return result;
@@ -57,17 +62,19 @@ BigInt BigInt::operator+(const BigInt &rhs) const
 
     // Same sign --> perform addition of magnitudes
     result.negative = this->negative; 
-    result = this->addMagnitudes(rhs); 
+    result = this->add_magnitudes(rhs); 
     return result;
 }
 
 // Helper function using the “grade school” algorithm for operator+
-BigInt BigInt::addMagnitudes(const BigInt &rhs) const {
+BigInt BigInt::add_magnitudes(const BigInt &rhs) const 
+{
     BigInt result;
     uint64_t carry = 0;
     size_t maxLength = std::max(this->magnitude.size(), rhs.magnitude.size());
 
-    for (size_t i = 0; i < maxLength || carry; ++i) {
+    for (size_t i = 0; i < maxLength || carry; ++i)
+    {
         uint64_t a = this->get_bits(i);
         uint64_t b = rhs.get_bits(i);
         uint64_t sum = a + b + carry;
@@ -84,35 +91,39 @@ BigInt BigInt::addMagnitudes(const BigInt &rhs) const {
 
 BigInt BigInt::operator-(const BigInt &rhs) const
 {
-  // TODO: implement
-  // Hint: a - b could be computed as a + -b
-  //Uses the negation of rhs and calls operator+
     BigInt negatedRhs = -rhs;
     return *this + negatedRhs;
 }
 
 // Helper function for operator-
 // Assumes that lhs >= rhs for magnitude
-BigInt BigInt::subtractMagnitudes(const BigInt &rhs) const {
+BigInt BigInt::subtract_magnitudes(const BigInt &rhs) const 
+{
     BigInt result;
     bool borrow = false; // Boolean to see if needs to borrow from next column
 
     // Loop range is determined by obejcts since we assume lhs is greater
-    for (size_t i = 0; i < this->magnitude.size(); ++i) {
+    for (size_t i = 0; i < this->magnitude.size(); ++i) 
+    {
         uint64_t this_digit = this->get_bits(i);
         uint64_t rhs_digit = rhs.get_bits(i);
-        if (borrow) {
-            if (this_digit == 0) {   // If 0, borrow makes this_digit uint64_max
+        if (borrow) 
+        {
+            if (this_digit == 0) 
+            {   // If 0, borrow makes this_digit uint64_max
                 this_digit = UINT64_MAX;
-            } else {
+            } 
+            else 
+            {
                 this_digit -= 1;
                 borrow = false;
             }
         }
         // Check if borrow needed for current digit's subtraction
-        if (this_digit < rhs_digit){
+        if (this_digit < rhs_digit)
+        {
           borrow = true;
-          this_digit += (1ULL << 64);
+          this_digit += (1ULL << 63);
         } 
 
         uint64_t diff = this_digit - rhs_digit; // Calculate the diff
@@ -120,7 +131,8 @@ BigInt BigInt::subtractMagnitudes(const BigInt &rhs) const {
     }
 
     // Remove trailing zeros
-    while (!result.magnitude.empty() && result.magnitude.back() == 0) {
+    while (!result.magnitude.empty() && result.magnitude.back() == 0) 
+    {
         result.magnitude.pop_back();
     }
 
@@ -148,7 +160,7 @@ bool BigInt::is_bit_set(unsigned n) const
     // Check if the bit is stored in the vector
     if (n >= num_bits)
     {
-       return false; 
+        return false; 
     }
 
     // Next we figure out which index in the vector
@@ -215,18 +227,21 @@ int BigInt::compare(const BigInt &rhs) const
 
     bool reverse = this->negative; // If both negative, use inverted logic
 
-    return this->compareMagnitudes(rhs) * (reverse ? -1 : 1); // Compare magnitudes
+    return this->compare_magnitudes(rhs) * (reverse ? -1 : 1); // Compare magnitudes
 }
 
 // Helper function for compareMagnitude
 // Returns -1 if *this is smaller, 1 if *this is larger, and 0 if equal
-int BigInt::compareMagnitudes(const BigInt &rhs) const 
+int BigInt::compare_magnitudes(const BigInt &rhs) const 
 {
-    if (this->magnitude.size() != rhs.magnitude.size()) {
+    if (this->magnitude.size() != rhs.magnitude.size()) 
+    {
         return this->magnitude.size() < rhs.magnitude.size() ? -1 : 1;
     }
-    for (int i = this->magnitude.size() - 1; i >= 0; --i) {
-        if (this->magnitude[i] != rhs.magnitude[i]) {
+    for (int i = this->magnitude.size() - 1; i >= 0; --i) 
+    {
+        if (this->magnitude[i] != rhs.magnitude[i]) 
+        {
             return this->magnitude[i] < rhs.magnitude[i] ? -1 : 1;
         }
     }
@@ -236,7 +251,8 @@ int BigInt::compareMagnitudes(const BigInt &rhs) const
 std::string BigInt::to_hex() const // Convert the magnitude (stored as a vector of unint64_t) to hexdec string
 {
   // Check is magnitude vector is empty OR if it has one element 0
-  if (magnitude.empty() || (magnitude.size() == 1 && magnitude[0] == 0)) {
+  if (magnitude.empty() || (magnitude.size() == 1 && magnitude[0] == 0)) 
+  {
     return "0";
   }
 

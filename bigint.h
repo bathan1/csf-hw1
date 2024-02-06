@@ -18,13 +18,13 @@ private:
     bool negative;
 
     // Helper function to add magnitudes
-    BigInt addMagnitudes(const BigInt &rhs) const;
+    BigInt add_magnitudes(const BigInt &rhs) const;
 
     // Helper function to subtract the magnitude
-    BigInt subtractMagnitudes(const BigInt &rhs) const;
+    BigInt subtract_magnitudes(const BigInt &rhs) const;
 
     // Helper function to compare the magnitudes
-    int compareMagnitudes(const BigInt &rhs) const;
+    int compare_magnitudes(const BigInt &rhs) const;
 
 public:
   //! Default constructor.
