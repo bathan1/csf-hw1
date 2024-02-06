@@ -67,7 +67,7 @@ void test_shift_left(TestObjs *objs);
 void test_adding_negative_numbers(TestObjs *objs);
 void test_subtracting_with_overflow(TestObjs *objs);
 void test_multiplying_by_zero(TestObjs *objs);
-void test_dividing_by_one(TestObjs *objs)
+void test_dividing_by_one(TestObjs *objs);
 
 int main(int argc, char **argv) {
   if (argc > 1) {

@@ -163,7 +163,36 @@ bool BigInt::is_bit_set(unsigned n) const
 
 BigInt BigInt::operator<<(unsigned n) const
 {
-  // TODO: implement
+    if (negative) throw std::invalid_argument("Cannot left shift a negative BigInt");
+
+    BigInt result;
+    unsigned shift_chunks = n / 64;
+    unsigned shift_bits = n % 64;
+
+    result.magnitude.resize(magnitude.size() + shift_chunks, 0);
+    // If we have a remainder resulting from n / 64, we have to include an additional index for the chunk.
+    if (shift_bits > 0) result.magnitude.push_back(0);
+
+    for (size_t i = 0; i < magnitude.size(); ++i) 
+    {
+        uint64_t chunk = magnitude[i];
+        if (shift_bits > 0 && i + shift_chunks + 1 < result.magnitude.size()) 
+        {
+            // If we have an intra-chunk due to shift_bits > 0, we have to right shift it so that the
+            // succeeding chunk has the overflown bits.
+            result.magnitude[i + shift_chunks + 1] |= (chunk >> (64 - shift_bits));
+        }
+        // Now assign the original chunk left shifted to its new position in the result vector.
+        result.magnitude[i + shift_chunks] |= (chunk << shift_bits);
+    }
+
+    // Remove leading zeros
+    while (!result.magnitude.empty() && result.magnitude.back() == 0) 
+    {
+        result.magnitude.pop_back();
+    }
+
+    return result; 
 }
 
 BigInt BigInt::operator*(const BigInt &rhs) const
@@ -178,14 +207,15 @@ BigInt BigInt::operator/(const BigInt &rhs) const
 
 int BigInt::compare(const BigInt &rhs) const
 {
-  // Check the sign
-  if (this->negative != rhs.negative) {
+    // Check the sign
+    if (this->negative != rhs.negative) 
+    {
         return this->negative ? -1 : 1;
     }
 
-  bool reverse = this->negative; // If both negative, use inverted logic
+    bool reverse = this->negative; // If both negative, use inverted logic
 
-  return this->compareMagnitudes(rhs) * (reverse ? -1 : 1); // Compare magnitudes
+    return this->compareMagnitudes(rhs) * (reverse ? -1 : 1); // Compare magnitudes
 }
 
 // Helper function for compareMagnitude
