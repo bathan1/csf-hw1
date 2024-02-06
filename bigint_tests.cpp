@@ -68,12 +68,9 @@ void test_adding_negative_numbers(TestObjs *objs);
 void test_subtracting_with_overflow(TestObjs *objs);
 void test_multiplying_by_zero(TestObjs *objs);
 void test_dividing_by_one(TestObjs *objs);
-<<<<<<< HEAD
-=======
 void test_compare_wide(TestObjs *objs);
 void test_multiplication(TestObjs *objs);
 void test_division(TestObjs *objs);
->>>>>>> origin/milestone2
 
 int main(int argc, char **argv) {
   if (argc > 1) {
@@ -755,7 +752,7 @@ void test_multiplication(TestObjs *objs) {
 // Additional tests for division
 void test_division(TestObjs *objs) {
     // Division resulting in a fraction 
-    result = objs->nine / objs->two;
+    BigInt result = objs->nine / objs->two;
     check_contents(result, {4UL}); // 9 / 2 = 4.5 = 4
     ASSERT(!result.is_negative());
 
