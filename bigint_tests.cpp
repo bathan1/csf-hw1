@@ -67,7 +67,10 @@ void test_shift_left(TestObjs *objs);
 void test_adding_negative_numbers(TestObjs *objs);
 void test_subtracting_with_overflow(TestObjs *objs);
 void test_multiplying_by_zero(TestObjs *objs);
-void test_dividing_by_one(TestObjs *objs)
+void test_dividing_by_one(TestObjs *objs);
+void test_compare_wide(TestObjs *objs);
+void test_multiplication(TestObjs *objs);
+void test_division(TestObjs *objs);
 
 int main(int argc, char **argv) {
   if (argc > 1) {
@@ -111,6 +114,9 @@ int main(int argc, char **argv) {
   TEST(test_subtracting_with_overflow);
   TEST(test_multiplying_by_zero);
   TEST(test_dividing_by_one);
+  TEST(test_compare_wide);
+  TEST(test_multiplication);
+  TEST(test_division);
 
   TEST_FINI();
 }
@@ -665,14 +671,14 @@ void test_shift_left(TestObjs *objs) {
   check_contents(largeShift, {0UL, 2UL});
 }
 
-// Additional tests for adding Negative Numbers
+// Extra tests for adding Negative Numbers
 void test_adding_negative_numbers(TestObjs *objs) {
   BigInt sumNeg = objs->negative_three + objs->negative_nine;
   check_contents(sumNeg, {12UL});
   ASSERT(sumNeg.is_negative());
 }
 
-// Additional test for Subtracting With Overflow
+// Extra test for Subtracting With Overflow
 void test_subtracting_with_overflow(TestObjs *objs) {
   
   BigInt subOverflow = objs->zero - objs->u64_max;
@@ -680,14 +686,85 @@ void test_subtracting_with_overflow(TestObjs *objs) {
   ASSERT(subOverflow.is_negative());
 }
 
-// Additional tests for Multiplying By Zero
+// Extra tests for Multiplying By Zero
 void test_multiplying_by_zero(TestObjs *objs) {
   BigInt mulZero = objs->u64_max * objs->zero;
   check_contents(mulZero, {0UL});
 }
 
-// Additional tests for Dividing By One
+// Extra tests for Dividing By One
 void test_dividing_by_one(TestObjs *objs) {
   BigInt divOne = objs->u64_max / objs->one;
   check_contents(divOne, {0xFFFFFFFFFFFFFFFFUL});
+}
+
+// Additional tests for compare
+void test_compare_wide(TestObjs *objs) {
+    // Compare equal numbers
+    BigInt num1(123456789UL);
+    BigInt num2(123456789UL);
+    ASSERT(objs->zero.compare(objs->zero) == 0);
+    ASSERT(num1.compare(num2) == 0);
+
+    BigInt num3(987654321UL);
+    ASSERT(num1.compare(num3) < 0);
+    ASSERT(num3.compare(num1) > 0);
+
+    // Compare with negative numbers
+    BigInt negative_num(-123456789UL);
+    ASSERT(negative_num.compare(num1) < 0);
+    ASSERT(num1.compare(negative_num) > 0);
+
+    // Compare large numbers
+    BigInt large1({0xFFFFFFFFFFFFFFFFUL, 0x1UL}); // This one is laerger than any single single uint64_t
+    BigInt large2({0xFFFFFFFFFFFFFFFEUL, 0x1UL});
+    ASSERT(large1.compare(large2) > 0);
+    ASSERT(large2.compare(large1) < 0);
+}
+
+// Additional tests for multiplication
+void test_multiplication(TestObjs *objs) {
+    // Multiplication by zero
+    BigInt result = objs->zero * objs->nine;
+    check_contents(result, {0UL});
+    ASSERT(!result.is_negative());
+
+    // Multiplication by one
+    result = objs->one * objs->nine;
+    check_contents(result, {9UL});
+    ASSERT(!result.is_negative());
+
+    // Multiplication by two large numbers
+    BigInt large1({0xFFFFFFFFUL, 0x2UL}); // 2^64 + 2^32 - 1
+    BigInt large2(2UL);
+    result = large1 * large2;
+    check_contents(result, {0xFFFFFFFEUL, 0x5UL}); // Should carry
+    ASSERT(!result.is_negative());
+
+    // Multiplication by a negative number
+    BigInt negative_one(-1UL);
+    result = negative_one * objs->nine;
+    check_contents(result, {9UL});
+    ASSERT(result.is_negative());
+}
+
+
+// Additional tests for division
+void test_division(TestObjs *objs) {
+    // Division resulting in a fraction 
+    result = objs->nine / objs->two;
+    check_contents(result, {4UL}); // 9 / 2 = 4.5 = 4
+    ASSERT(!result.is_negative());
+
+    // Negative number
+    BigInt negative_nine(-9UL);
+    result = negative_nine / objs->two;
+    check_contents(result, {4UL}); // -9 / 2 = -4.5 = -4
+    ASSERT(result.is_negative());
+
+    // Larger divisor than dividend
+    BigInt large_divisor(100UL);
+    result = objs->nine / large_divisor;
+    check_contents(result, {0UL}); 
+    ASSERT(!result.is_negative());
 }
