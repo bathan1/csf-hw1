@@ -15,7 +15,12 @@ BigInt::BigInt(const BigInt &other) : magnitude(other.magnitude), negative(other
 
 BigInt::~BigInt() {}
 
-BigInt &BigInt::operator=(const BigInt &rhs) {}
+BigInt &BigInt::operator=(const BigInt &rhs) 
+{
+    this->negative = rhs.negative;
+    this->magnitude = rhs.magnitude;
+    return *this;
+}
 
 bool BigInt::is_negative() const
 {
@@ -49,7 +54,6 @@ BigInt BigInt::operator+(const BigInt &rhs) const
             // If *this larger or equal magnitude, subtract rhs magnitude from *this magnitude
             result = this->subtract_magnitudes(rhs);
             result.negative = this->negative; 
-            
         } 
         else 
         {
@@ -71,16 +75,16 @@ BigInt BigInt::add_magnitudes(const BigInt &rhs) const
 {
     BigInt result;
     uint64_t carry = 0;
-    size_t maxLength = std::max(this->magnitude.size(), rhs.magnitude.size());
+    size_t max_length = std::max(this->magnitude.size(), rhs.magnitude.size());
 
-    for (size_t i = 0; i < maxLength || carry; ++i)
+    for (size_t i = 0; i < max_length || carry; ++i)
     {
-        uint64_t a = this->get_bits(i);
-        uint64_t b = rhs.get_bits(i);
-        uint64_t sum = a + b + carry;
+        uint64_t lhs_chunk = this->get_bits(i);
+        uint64_t rhs_chunk = rhs.get_bits(i);
+        uint64_t sum = lhs_chunk + rhs_chunk + carry;
 
         //Detect addition overflow
-        if (sum < a || sum < b) carry = 1;
+        if (sum < lhs_chunk || sum < rhs_chunk) carry = 1;
         else carry = 0;
 
         // Appends modulo 2^64 sum to the result magnitude
@@ -139,8 +143,6 @@ BigInt BigInt::subtract_magnitudes(const BigInt &rhs) const
     return result;
 }
 
-
-
 BigInt BigInt::operator-() const
 {
   BigInt result(*this); //Make a copy of the current BigInt
@@ -151,8 +153,6 @@ BigInt BigInt::operator-() const
   }
   return result;
 }
-
-
 
 bool BigInt::is_bit_set(unsigned n) const
 {
@@ -209,7 +209,19 @@ BigInt BigInt::operator<<(unsigned n) const
 
 BigInt BigInt::operator*(const BigInt &rhs) const
 {
-  // TODO: implement
+    BigInt product = BigInt();
+    product.negative = this->negative == rhs.negative ? false : true;    
+    
+    BigInt pos_lhs = BigInt(*this);
+    BigInt pos_rhs = BigInt(rhs);
+    for (int i = 0; i < pos_rhs.magnitude.size() * 64; i++)
+    {
+        if (pos_rhs.is_bit_set(i))
+        {
+           product = product + (pos_lhs << i); 
+        }
+    }
+    return product;
 }
 
 BigInt BigInt::operator/(const BigInt &rhs) const
@@ -250,32 +262,32 @@ int BigInt::compare_magnitudes(const BigInt &rhs) const
 
 std::string BigInt::to_hex() const // Convert the magnitude (stored as a vector of unint64_t) to hexdec string
 {
-  // Check is magnitude vector is empty OR if it has one element 0
-  if (magnitude.empty() || (magnitude.size() == 1 && magnitude[0] == 0)) 
-  {
-    return "0";
-  }
-
-  // Loop through mag vec in reverse (store endian little-endian format) to construct hex
-  std::stringstream ss;
-  for (auto i = magnitude.rbegin(); i != magnitude.rend(); ++i) 
-  {
-    if (i != magnitude.rbegin()) 
+    // Check is magnitude vector is empty OR if it has one element 0
+    if (magnitude.empty() || (magnitude.size() == 1 && magnitude[0] == 0)) 
     {
-      ss << std::setfill('0') << std::setw(16);
+        return "0";
     }
-    ss << std::hex << *i;
-  }
 
-  std::string result = ss.str();
-  result.erase(0, result.find_first_not_of('0')); // Remove leading 0's
+    // Loop through mag vec in reverse (store endian little-endian format) to construct hex
+    std::stringstream ss;
+    for (auto i = magnitude.rbegin(); i != magnitude.rend(); ++i) 
+    {
+        if (i != magnitude.rbegin()) 
+        {
+        ss << std::setfill('0') << std::setw(16);
+        }
+        ss << std::hex << *i;
+    }
 
-  if (negative && result != "0") 
-  {
-    result = "-" + result;
-  }
+    std::string result = ss.str();
+    result.erase(0, result.find_first_not_of('0')); // Remove leading 0's
 
-  return result;
+    if (negative && result != "0") 
+    {
+        result = "-" + result;
+    }
+
+    return result;
 }
 
 std::string BigInt::to_dec() const
