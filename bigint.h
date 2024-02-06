@@ -17,6 +17,15 @@ private:
     std::vector<uint64_t> magnitude;
     bool negative;
 
+    // Helper function to add magnitudes
+    BigInt addMagnitudes(const BigInt &rhs) const;
+
+    // Helper function to subtract the magnitude
+    BigInt subtractMagnitudes(const BigInt &rhs) const;
+
+    // Helper function to compare the magnitudes
+    int compareMagnitudes(const BigInt &rhs) const;
+
 public:
   //! Default constructor.
   //! The initialized BigInt value should be equal to 0.
