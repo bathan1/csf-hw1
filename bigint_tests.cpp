@@ -712,7 +712,7 @@ void test_compare_wide(TestObjs *objs) {
     ASSERT(num3.compare(num1) > 0);
 
     // Compare with negative numbers
-    BigInt negative_num(-123456789UL);
+    BigInt negative_num(123456789UL, true);
     ASSERT(negative_num.compare(num1) < 0);
     ASSERT(num1.compare(negative_num) > 0);
 
@@ -743,7 +743,7 @@ void test_multiplication(TestObjs *objs) {
     ASSERT(!result.is_negative());
 
     // Multiplication by a negative number
-    BigInt negative_one(-1UL);
+    BigInt negative_one(1UL, true);
     result = negative_one * objs->nine;
     check_contents(result, {9UL});
     ASSERT(result.is_negative());
@@ -758,7 +758,7 @@ void test_division(TestObjs *objs) {
     ASSERT(!result.is_negative());
 
     // Negative number
-    BigInt negative_nine(-9UL);
+    BigInt negative_nine(9UL, true);
     result = negative_nine / objs->two;
     check_contents(result, {4UL}); // -9 / 2 = -4.5 = -4
     ASSERT(result.is_negative());

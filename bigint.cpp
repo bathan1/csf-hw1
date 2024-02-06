@@ -246,33 +246,48 @@ BigInt BigInt::operator/(const BigInt &rhs) const
     }
 
     // If the divisor > dividend, then we simply return 0.
-    if (rhs > *this)
+    if (rhs.compare_magnitudes(*this) > 0)
     {
         return BigInt();    
     }
 
+    // Make a reference to the positive magnitudes.
+    BigInt pos_this = *this;
+    pos_this.negative = false;
+    BigInt pos_rhs = rhs;
+    pos_rhs.negative = false;
+
     BigInt high = *this;
-    BigInt low = BigInt();
-    BigInt mid = high.divide_by_two();
+    high.negative = false;
+    BigInt low = BigInt(1);
+    BigInt mid = (low + high).divide_by_two();
 
     while (low < high)
     {
-        BigInt product = mid * rhs;  
-        if (product == *this)
+        BigInt product = mid * pos_rhs;  
+        if (product == pos_this)
         {
+            if (this->negative != rhs.negative)
+            {
+                mid.negative = true;
+            }
             return mid;
         }
 
-        if (product > *this)
+        if (product > pos_this)
         {
-            high = mid - BigInt(1);
+            high = mid - 1;
             mid = (low + high).divide_by_two();
         }
         else 
         {
-            low = mid + BigInt(1);
+            low = mid + 1;
             mid = (low + high).divide_by_two();
         }
+    }
+    if (this->negative != rhs.negative)
+    {
+        low.negative = true;
     }
     return low;
 }
