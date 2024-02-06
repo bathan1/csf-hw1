@@ -71,6 +71,7 @@ void test_dividing_by_one(TestObjs *objs);
 void test_compare_wide(TestObjs *objs);
 void test_multiplication(TestObjs *objs);
 void test_division_edge_cases(TestObjs *objs);
+void test_division_larger_numbers(TestObjs *objs);
 
 int main(int argc, char **argv) {
   if (argc > 1) {
@@ -103,6 +104,7 @@ int main(int argc, char **argv) {
   TEST(test_division_edge_cases);
   TEST(test_division);
   TEST(test_div_1);
+  TEST(test_division_larger_numbers);
   TEST(test_div_2);
   TEST(test_to_hex_1);
   TEST(test_to_hex_2);
@@ -767,6 +769,21 @@ void test_division(TestObjs *objs) {
     BigInt large_divisor(100UL);
     result = objs->nine / large_divisor;
     check_contents(result, {0UL}); 
+    ASSERT(!result.is_negative());
+}
+
+void test_division_larger_numbers(TestObjs *objs) {
+
+    BigInt rhs = BigInt(UINT32_MAX);
+    rhs = rhs + BigInt(2);
+    BigInt result = BigInt(UINT64_MAX) / rhs;
+    check_contents(result, {UINT32_MAX});
+    ASSERT(!result.is_negative());
+
+    BigInt lhs = BigInt({0, 0, 1}, false);
+    rhs = BigInt(UINT64_MAX, false);
+    result = lhs / rhs;
+    check_contents(result, {3});
     ASSERT(!result.is_negative());
 }
 
