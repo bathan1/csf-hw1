@@ -63,6 +63,11 @@ void test_to_dec_2(TestObjs *objs);
 // TODO: declare additional test functions
 void test_minus_operator(TestObjs *objs);
 void test_is_bit_set_0(TestObjs *objs);
+void test_shift_left(TestObjs *objs);
+void test_adding_negative_numbers(TestObjs *objs);
+void test_subtracting_with_overflow(TestObjs *objs);
+void test_multiplying_by_zero(TestObjs *objs);
+void test_dividing_by_one(TestObjs *objs)
 
 int main(int argc, char **argv) {
   if (argc > 1) {
@@ -101,6 +106,11 @@ int main(int argc, char **argv) {
   // TODO: add calls to TEST for additional test functions
   TEST(test_minus_operator);
   TEST(test_is_bit_set_0);
+  TEST(test_shift_left);
+  TEST(test_adding_negative_numbers);
+  TEST(test_subtracting_with_overflow);
+  TEST(test_multiplying_by_zero);
+  TEST(test_dividing_by_one);
 
   TEST_FINI();
 }
@@ -593,18 +603,22 @@ void test_to_dec_2(TestObjs *) {
 
 // Additional test for unary minus operation (Milestone 1)
 void test_minus_operator(TestObjs *objs) {
+  // Negating Zero
   BigInt result1 = -objs->zero;
   check_contents(result1, { 0UL });
   ASSERT(!result1.is_negative());
 
+  // Negating Positive Number
   BigInt result2 = -objs->three;
   check_contents(result2, { 3UL });
   ASSERT(result2.is_negative());
 
+  // Negating Negative Number
   BigInt result3 = -objs->negative_three;
   check_contents(result3, { 3UL });
   ASSERT(!result3.is_negative());
 
+  // Large Numbers
   BigInt result4 = -objs->two_pow_64;
   check_contents(result4, { 0UL, 1UL }); //contents should have two elements with secodn element being 1
   ASSERT(result4.is_negative());
@@ -633,4 +647,47 @@ void test_is_bit_set_0(TestObjs *objs) {
     BigInt two_pow_64 = objs->two_pow_64;
     check_contents(two_pow_64, { 0UL, 1UL });
     ASSERT(two_pow_64.is_bit_set(64));
+}
+
+// Additional test for shift left
+void test_shift_left(TestObjs *objs) {
+  // Shifting Zero
+  BigInt shiftZero = objs->zero << 10;
+  check_contents(shiftZero, {0UL});
+  ASSERT(!shiftZero.is_negative());
+
+  // Basic Shifts
+  BigInt shiftOne = objs->one << 1;
+  check_contents(shiftOne, {2UL});
+
+  // Larger Shifts
+  BigInt largeShift = objs->one << 65;
+  check_contents(largeShift, {0UL, 2UL});
+}
+
+// Additional tests for adding Negative Numbers
+void test_adding_negative_numbers(TestObjs *objs) {
+  BigInt sumNeg = objs->negative_three + objs->negative_nine;
+  check_contents(sumNeg, {12UL});
+  ASSERT(sumNeg.is_negative());
+}
+
+// Additional test for Subtracting With Overflow
+void test_subtracting_with_overflow(TestObjs *objs) {
+  
+  BigInt subOverflow = objs->zero - objs->u64_max;
+  check_contents(subOverflow, {0xFFFFFFFFFFFFFFFFUL});
+  ASSERT(subOverflow.is_negative());
+}
+
+// Additional tests for Multiplying By Zero
+void test_multiplying_by_zero(TestObjs *objs) {
+  BigInt mulZero = objs->u64_max * objs->zero;
+  check_contents(mulZero, {0UL});
+}
+
+// Additional tests for Dividing By One
+void test_dividing_by_one(TestObjs *objs) {
+  BigInt divOne = objs->u64_max / objs->one;
+  check_contents(divOne, {0xFFFFFFFFFFFFFFFFUL});
 }
