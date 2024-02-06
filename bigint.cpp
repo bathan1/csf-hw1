@@ -226,7 +226,62 @@ BigInt BigInt::operator*(const BigInt &rhs) const
 
 BigInt BigInt::operator/(const BigInt &rhs) const
 {
-  // TODO: implement
+    if (rhs.magnitude.empty())
+    {
+        throw std::invalid_argument("Can't divide by 0!");
+    }
+
+    // If the divisor > dividend, then we simply return 0.
+    if (rhs > *this)
+    {
+        return BigInt();    
+    }
+
+    BigInt high = *this;
+    BigInt low = BigInt();
+    BigInt mid = high.divide_by_two();
+
+    while (low < high)
+    {
+        BigInt product = mid * rhs;  
+        if (product == *this)
+        {
+            return mid;
+        }
+
+        if (product > *this)
+        {
+            high = mid - BigInt(1);
+            mid = (low + high).divide_by_two();
+        }
+        else 
+        {
+            low = mid + BigInt(1);
+            mid = (low + high).divide_by_two();
+        }
+    }
+    return low;
+}
+
+BigInt BigInt::divide_by_two() const
+{
+    BigInt result = BigInt();
+    result.negative = this->negative;
+
+    uint64_t carry = 0;
+    for (int i = this->magnitude.size() - 1; i > -1; i--)
+    {
+        uint64_t chunk = this->magnitude[i];
+        uint64_t new_carry = chunk & 1UL;
+        chunk >>= 1UL;
+        chunk |= carry << 63; // Now carry over the previous carry with an OR operator
+        result.magnitude.push_back(chunk);
+        carry = new_carry;
+    }
+
+    while (result.magnitude.size() > 1 && result.magnitude.back() == 0) result.magnitude.pop_back();
+
+    return result;
 }
 
 int BigInt::compare(const BigInt &rhs) const

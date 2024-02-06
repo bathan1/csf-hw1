@@ -26,6 +26,8 @@ private:
     // Helper function to compare the magnitudes
     int compare_magnitudes(const BigInt &rhs) const;
 
+    BigInt divide_by_two() const;
+
 public:
   //! Default constructor.
   //! The initialized BigInt value should be equal to 0.
@@ -193,8 +195,6 @@ public:
   //! @return the value of this BigInt object in decimal (base-10)
   std::string to_dec() const;
 
-private:
-  // TODO: add helper functions
 };
 
 #endif // BIGINT_H

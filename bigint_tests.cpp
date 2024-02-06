@@ -54,6 +54,7 @@ void test_mul_1(TestObjs *objs);
 void test_mul_2(TestObjs *objs);
 void test_compare_1(TestObjs *objs);
 void test_compare_2(TestObjs *objs);
+void test_division(TestObjs *objs);
 void test_div_1(TestObjs *objs);
 void test_div_2(TestObjs *objs);
 void test_to_hex_1(TestObjs *objs);
@@ -70,7 +71,7 @@ void test_multiplying_by_zero(TestObjs *objs);
 void test_dividing_by_one(TestObjs *objs);
 void test_compare_wide(TestObjs *objs);
 void test_multiplication(TestObjs *objs);
-void test_division(TestObjs *objs);
+void test_division_edge_cases(TestObjs *objs);
 
 int main(int argc, char **argv) {
   if (argc > 1) {
@@ -100,6 +101,8 @@ int main(int argc, char **argv) {
   TEST(test_mul_2);
   TEST(test_compare_1);
   TEST(test_compare_2);
+  TEST(test_division_edge_cases);
+  TEST(test_division);
   TEST(test_div_1);
   TEST(test_div_2);
   TEST(test_to_hex_1);
@@ -116,7 +119,6 @@ int main(int argc, char **argv) {
   TEST(test_dividing_by_one);
   TEST(test_compare_wide);
   TEST(test_multiplication);
-  TEST(test_division);
 
   TEST_FINI();
 }
@@ -767,4 +769,19 @@ void test_division(TestObjs *objs) {
     result = objs->nine / large_divisor;
     check_contents(result, {0UL}); 
     ASSERT(!result.is_negative());
+}
+
+// Test the edge cases for division
+void test_division_edge_cases(TestObjs *objs) {
+    // Division by 0
+    try {
+        BigInt bad = objs->one / objs->zero;
+        FAIL("Divide by 0 didn't throw an exception as expected.");
+    } catch (std::invalid_argument &ex) {
+        // Made it here, then we successfully handled division by 0.
+    }
+
+    // Division by a divisor > dividend
+    BigInt bad = objs->one / objs->two;
+    ASSERT(bad == BigInt());
 }
