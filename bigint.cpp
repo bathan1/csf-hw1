@@ -97,21 +97,25 @@ BigInt BigInt::subtractMagnitudes(const BigInt &rhs) const {
     BigInt result;
     bool borrow = false; // Boolean to see if needs to borrow from next column
 
-    // Loop range is determined by lhs since we assume lhs is greater
-    for (size_t i = 0; i < lhs.magnitude.size(); ++i) {
-        uint64_t lhs_digit = lhs.get_bits(i);
+    // Loop range is determined by obejcts since we assume lhs is greater
+    for (size_t i = 0; i < this->magnitude.size(); ++i) {
+        uint64_t this_digit = this->get_bits(i);
         uint64_t rhs_digit = rhs.get_bits(i);
         if (borrow) {
-            if (lhs_digit <= rhs_digit) {
-                lhs_digit += (1ULL << 64) - 1; 
+            if (this_digit == 0) {   // If 0, borrow makes this_digit uint64_max
+                this_digit = UINT64_MAX;
             } else {
-                lhs_digit -= 1;
+                this_digit -= 1;
                 borrow = false;
             }
         }
         // Check if borrow needed for current digit's subtraction
-        if (lhs_digit < rhs_digit) borrow = true;
-        uint64_t diff = lhs_digit - rhs_digit;
+        if (this_digit < rhs_digit){
+          borrow = true;
+          this_digit += (1ULL << 64);
+        } 
+
+        uint64_t diff = this_digit - rhs_digit; // Calculate the diff
         result.magnitude.push_back(diff);
     }
 
@@ -123,10 +127,10 @@ BigInt BigInt::subtractMagnitudes(const BigInt &rhs) const {
     return result;
 }
 
+
+
 BigInt BigInt::operator-() const
 {
-  // TODO: implement
-
   BigInt result(*this); //Make a copy of the current BigInt
   if (!(magnitude.empty() || (magnitude.size() == 1 && magnitude[0] == 0 ))) 
   {
@@ -135,6 +139,8 @@ BigInt BigInt::operator-() const
   }
   return result;
 }
+
+
 
 bool BigInt::is_bit_set(unsigned n) const
 {
