@@ -103,34 +103,48 @@ BigInt BigInt::operator-(const BigInt &rhs) const
 // Assumes that lhs >= rhs for magnitude
 BigInt BigInt::subtract_magnitudes(const BigInt &rhs) const 
 {
-    BigInt result;
-    bool borrow = false; // Boolean to see if needs to borrow from next column
+    BigInt result = BigInt();
+    bool borrow = false;
 
     // Loop range is determined by obejcts since we assume lhs is greater
     for (size_t i = 0; i < this->magnitude.size(); ++i) 
     {
-        uint64_t this_digit = this->get_bits(i);
-        uint64_t rhs_digit = rhs.get_bits(i);
-        if (borrow) 
-        {
-            if (this_digit == 0) 
-            {   // If 0, borrow makes this_digit uint64_max
-                this_digit = UINT64_MAX;
-            } 
-            else 
-            {
-                this_digit -= 1;
-                borrow = false;
-            }
-        }
-        // Check if borrow needed for current digit's subtraction
-        if (this_digit < rhs_digit)
-        {
-          borrow = true;
-          this_digit += (1ULL << 63);
-        } 
+        uint64_t left_chunk = this->magnitude[i];
+        uint64_t right_chunk = i < rhs.magnitude.size() ? rhs.magnitude[i] : 0;
 
-        uint64_t diff = this_digit - rhs_digit; // Calculate the diff
+        if (borrow)
+        {
+            if (left_chunk - 1 > left_chunk)
+            {
+                left_chunk = UINT64_MAX;
+            }
+            else
+            {
+                left_chunk -= 1;
+            }
+            borrow = false;
+        }
+
+        uint64_t diff = left_chunk - right_chunk;
+
+        // If we will end up with overflow since rhs_chunk > lhs_chunk,
+        // we can flip the operands to prevent the overflow and then use that
+        // result to help us calculate the true difference once we borrow.
+        if (right_chunk > left_chunk)
+        {
+            diff = right_chunk - left_chunk;
+            borrow = true;
+        }
+
+        // If borrow is true, then we can get the actual difference
+        // by getting taking the max value and then subtracting the inverted
+        // difference, and then adding an extra 1 to account for the max
+        // not being 2^64 but 2^64 - 1.
+        if (borrow)
+        {
+            diff = UINT64_MAX - diff + 1;
+        }
+
         result.magnitude.push_back(diff);
     }
 
