@@ -15,7 +15,6 @@ struct TestObjs {
   BigInt negative_nine;
   BigInt negative_three;
   BigInt nine;
-  // TODO: add additional test fixture objects
 
   TestObjs();
 };

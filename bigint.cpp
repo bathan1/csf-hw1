@@ -65,8 +65,8 @@ BigInt BigInt::operator+(const BigInt &rhs) const
     }
 
     // Same sign --> perform addition of magnitudes
-    result.negative = this->negative; 
     result = this->add_magnitudes(rhs); 
+    result.negative = this->negative; 
     return result;
 }
 
