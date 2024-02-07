@@ -777,18 +777,14 @@ void test_division(TestObjs *objs) {
 }
 
 void test_division_larger_numbers(TestObjs *objs) {
-
-    BigInt rhs = BigInt(UINT32_MAX);
-    rhs = rhs + BigInt(2);
-    BigInt result = BigInt(UINT64_MAX) / rhs;
-    check_contents(result, {UINT32_MAX});
+  {
+    BigInt left({0x5a1f7b06e95d205bUL, 0x16bef383084c9bf5UL, 0x6bfd5cb9a0cfa403UL, 0xbb47e519c0ffc392UL, 0xc8c47a8ab9cc20afUL, 0x30302fb07ef81d25UL, 0x8b8bcb6df3f72911UL, 0x3de679169dc89703UL, 0x48f52b428f255e1dUL, 0xd623c2e8a460f5beUL, 0xae2df81a84808054UL, 0xcfb038910d158d63UL, 0xcf97bc9UL});
+    BigInt right({0xe1d191b09fd571e7UL, 0xd6e34973337d88fdUL, 0x7235628c33211b03UL, 0xe0bbc74b5d7fe26aUL, 0x8ad5d1b254c5d7dfUL, 0x5fc278b4b85b5a7UL});
+    BigInt result = left / right;
+    check_contents(result, {0x4UL});
     ASSERT(!result.is_negative());
+  }
 
-    BigInt lhs = BigInt({0, 0, 1}, false);
-    rhs = BigInt(UINT64_MAX, false);
-    result = lhs / rhs;
-    check_contents(result, {3});
-    ASSERT(!result.is_negative());
 }
 
 // Test the edge cases for division
