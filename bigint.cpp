@@ -160,7 +160,7 @@ BigInt BigInt::subtract_magnitudes(const BigInt &rhs) const
 BigInt BigInt::operator-() const
 {
   BigInt result(*this); //Make a copy of the current BigInt
-  if (!(magnitude.empty() || (magnitude.size() == 1 && magnitude[0] == 0 ))) 
+  if (!is_zero()) 
   {
     // Negative sign if num not zero
     result.negative = !negative;
@@ -347,7 +347,7 @@ int BigInt::compare_magnitudes(const BigInt &rhs) const
 std::string BigInt::to_hex() const // Convert the magnitude (stored as a vector of unint64_t) to hexdec string
 {
     // Check is magnitude vector is empty OR if it has one element 0
-    if (magnitude.empty() || (magnitude.size() == 1 && magnitude[0] == 0)) 
+    if (is_zero()) 
     {
         return "0";
     }
@@ -376,6 +376,46 @@ std::string BigInt::to_hex() const // Convert the magnitude (stored as a vector 
 
 std::string BigInt::to_dec() const
 {
-  // TODO: implement
+    // Check is magnitude vector is empty OR if it has one element with magnitude 0
+    if (is_zero()) 
+    {
+        return "0";
+    }
+
+    BigInt current = *this; 
+    current.negative = false; 
+
+    std::string result;
+    
+    while (!current.is_zero()) 
+    {
+        uint64_t remainder = 0;
+        for (int i = current.magnitude.size() - 1; i >= 0; --i) 
+        {
+            //Division and modulus by 10 for efficiency
+            uint64_t combined = remainder * (UINT64_MAX + 1ULL) + current.magnitude[i];
+            current.magnitude[i] = combined / 10;
+            remainder = combined % 10;
+        }
+        // Prepend remainder
+        result = std::to_string(remainder) + result;
+        
+        // Remove leading zeros 
+        while (!current.magnitude.empty() && current.magnitude.back() == 0) 
+        {
+            current.magnitude.pop_back();
+        }
+    }
+
+    if (negative) 
+    {
+        result = "-" + result;
+    }
+
+    return result;
 }
 
+bool BigInt::is_zero() const 
+{
+    return magnitude.empty() || (magnitude.size() == 1 && magnitude[0] == 0);
+}

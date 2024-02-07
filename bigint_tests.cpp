@@ -72,6 +72,8 @@ void test_compare_wide(TestObjs *objs);
 void test_multiplication(TestObjs *objs);
 void test_division_edge_cases(TestObjs *objs);
 void test_division_larger_numbers(TestObjs *objs);
+void test_large_positive_to_dec(TestObjs *objs);
+void test_large_negative_to_dec(TestObjs *objs);
 
 int main(int argc, char **argv) {
   if (argc > 1) {
@@ -110,7 +112,7 @@ int main(int argc, char **argv) {
   TEST(test_to_hex_2);
   TEST(test_to_dec_1);
   TEST(test_to_dec_2);
-  // TODO: add calls to TEST for additional test functions
+  // TODO: Additional calls to TEST for additional test functions
   TEST(test_minus_operator);
   TEST(test_is_bit_set_0);
   TEST(test_shift_left);
@@ -120,6 +122,8 @@ int main(int argc, char **argv) {
   TEST(test_dividing_by_one);
   TEST(test_compare_wide);
   TEST(test_multiplication);
+  TEST(test_large_positive_to_dec);
+  TEST(test_large_negative_to_dec);
 
   TEST_FINI();
 }
@@ -800,4 +804,18 @@ void test_division_edge_cases(TestObjs *objs) {
     // Division by a divisor > dividend
     BigInt bad = objs->one / objs->two;
     ASSERT(bad == BigInt());
+}
+
+// Test to_dec for large positive
+void test_large_positive_to_dec(TestObjs *objs) {
+    BigInt largePositive({0xFFFFFFFFFFFFFFFFUL, 0x1UL}); 
+    std::string expected = "18446744073709551615";
+    ASSERT(largePositive.to_dec() == expected);
+}
+
+// Test to_dec for large negative
+void test_large_negative_to_dec(TestObjs *objs) {
+    BigInt largeNegative({0xFFFFFFFFFFFFFFFFUL, 0x1UL}, true); 
+    std::string expected = "-18446744073709551615"; 
+    ASSERT(largeNegative.to_dec() == expected);
 }

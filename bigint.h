@@ -28,6 +28,8 @@ private:
 
     BigInt divide_by_two() const;
 
+    bool is_zero() const;
+
 public:
   //! Default constructor.
   //! The initialized BigInt value should be equal to 0.
