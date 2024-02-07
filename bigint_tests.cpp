@@ -15,7 +15,6 @@ struct TestObjs {
   BigInt negative_nine;
   BigInt negative_three;
   BigInt nine;
-  // TODO: add additional test fixture objects
 
   TestObjs();
 };
@@ -54,6 +53,7 @@ void test_mul_1(TestObjs *objs);
 void test_mul_2(TestObjs *objs);
 void test_compare_1(TestObjs *objs);
 void test_compare_2(TestObjs *objs);
+void test_division(TestObjs *objs);
 void test_div_1(TestObjs *objs);
 void test_div_2(TestObjs *objs);
 void test_to_hex_1(TestObjs *objs);
@@ -63,6 +63,17 @@ void test_to_dec_2(TestObjs *objs);
 // TODO: declare additional test functions
 void test_minus_operator(TestObjs *objs);
 void test_is_bit_set_0(TestObjs *objs);
+void test_shift_left(TestObjs *objs);
+void test_adding_negative_numbers(TestObjs *objs);
+void test_subtracting_with_overflow(TestObjs *objs);
+void test_multiplying_by_zero(TestObjs *objs);
+void test_dividing_by_one(TestObjs *objs);
+void test_compare_wide(TestObjs *objs);
+void test_multiplication(TestObjs *objs);
+void test_division_edge_cases(TestObjs *objs);
+void test_division_larger_numbers(TestObjs *objs);
+void test_large_positive_to_dec(TestObjs *objs);
+void test_large_negative_to_dec(TestObjs *objs);
 
 int main(int argc, char **argv) {
   if (argc > 1) {
@@ -92,15 +103,27 @@ int main(int argc, char **argv) {
   TEST(test_mul_2);
   TEST(test_compare_1);
   TEST(test_compare_2);
+  TEST(test_division_edge_cases);
+  TEST(test_division);
   TEST(test_div_1);
+  TEST(test_division_larger_numbers);
   TEST(test_div_2);
   TEST(test_to_hex_1);
   TEST(test_to_hex_2);
   TEST(test_to_dec_1);
   TEST(test_to_dec_2);
-  // TODO: add calls to TEST for additional test functions
+  // TODO: Additional calls to TEST for additional test functions
   TEST(test_minus_operator);
   TEST(test_is_bit_set_0);
+  TEST(test_shift_left);
+  TEST(test_adding_negative_numbers);
+  TEST(test_subtracting_with_overflow);
+  TEST(test_multiplying_by_zero);
+  TEST(test_dividing_by_one);
+  TEST(test_compare_wide);
+  TEST(test_multiplication);
+  TEST(test_large_positive_to_dec);
+  TEST(test_large_negative_to_dec);
 
   TEST_FINI();
 }
@@ -593,18 +616,22 @@ void test_to_dec_2(TestObjs *) {
 
 // Additional test for unary minus operation (Milestone 1)
 void test_minus_operator(TestObjs *objs) {
+  // Negating Zero
   BigInt result1 = -objs->zero;
   check_contents(result1, { 0UL });
   ASSERT(!result1.is_negative());
 
+  // Negating Positive Number
   BigInt result2 = -objs->three;
   check_contents(result2, { 3UL });
   ASSERT(result2.is_negative());
 
+  // Negating Negative Number
   BigInt result3 = -objs->negative_three;
   check_contents(result3, { 3UL });
   ASSERT(!result3.is_negative());
 
+  // Large Numbers
   BigInt result4 = -objs->two_pow_64;
   check_contents(result4, { 0UL, 1UL }); //contents should have two elements with secodn element being 1
   ASSERT(result4.is_negative());
@@ -633,4 +660,158 @@ void test_is_bit_set_0(TestObjs *objs) {
     BigInt two_pow_64 = objs->two_pow_64;
     check_contents(two_pow_64, { 0UL, 1UL });
     ASSERT(two_pow_64.is_bit_set(64));
+}
+
+// Additional test for shift left
+void test_shift_left(TestObjs *objs) {
+  // Shifting Zero
+  BigInt shiftZero = objs->zero << 10;
+  check_contents(shiftZero, {0UL});
+  ASSERT(!shiftZero.is_negative());
+
+  // Basic Shifts
+  BigInt shiftOne = objs->one << 1;
+  check_contents(shiftOne, {2UL});
+
+  // Larger Shifts
+  BigInt largeShift = objs->one << 65;
+  check_contents(largeShift, {0UL, 2UL});
+}
+
+// Extra tests for adding Negative Numbers
+void test_adding_negative_numbers(TestObjs *objs) {
+  BigInt sumNeg = objs->negative_three + objs->negative_nine;
+  check_contents(sumNeg, {12UL});
+  ASSERT(sumNeg.is_negative());
+}
+
+// Extra test for Subtracting With Overflow
+void test_subtracting_with_overflow(TestObjs *objs) {
+  
+  BigInt subOverflow = objs->zero - objs->u64_max;
+  check_contents(subOverflow, {0xFFFFFFFFFFFFFFFFUL});
+  ASSERT(subOverflow.is_negative());
+}
+
+// Extra tests for Multiplying By Zero
+void test_multiplying_by_zero(TestObjs *objs) {
+  BigInt mulZero = objs->u64_max * objs->zero;
+  check_contents(mulZero, {0UL});
+}
+
+// Extra tests for Dividing By One
+void test_dividing_by_one(TestObjs *objs) {
+  BigInt divOne = objs->u64_max / objs->one;
+  check_contents(divOne, {0xFFFFFFFFFFFFFFFFUL});
+}
+
+// Additional tests for compare
+void test_compare_wide(TestObjs *objs) {
+    // Compare equal numbers
+    BigInt num1(123456789UL);
+    BigInt num2(123456789UL);
+    ASSERT(objs->zero.compare(objs->zero) == 0);
+    ASSERT(num1.compare(num2) == 0);
+
+    BigInt num3(987654321UL);
+    ASSERT(num1.compare(num3) < 0);
+    ASSERT(num3.compare(num1) > 0);
+
+    // Compare with negative numbers
+    BigInt negative_num(123456789UL, true);
+    ASSERT(negative_num.compare(num1) < 0);
+    ASSERT(num1.compare(negative_num) > 0);
+
+    // Compare large numbers
+    BigInt large1({0xFFFFFFFFFFFFFFFFUL, 0x1UL}); // This one is laerger than any single single uint64_t
+    BigInt large2({0xFFFFFFFFFFFFFFFEUL, 0x1UL});
+    ASSERT(large1.compare(large2) > 0);
+    ASSERT(large2.compare(large1) < 0);
+}
+
+// Additional tests for multiplication
+void test_multiplication(TestObjs *objs) {
+    // Multiplication by zero
+    BigInt result = objs->zero * objs->nine;
+    check_contents(result, {0UL});
+    ASSERT(!result.is_negative());
+
+    // Multiplication by one
+    result = objs->one * objs->nine;
+    check_contents(result, {9UL});
+    ASSERT(!result.is_negative());
+
+    // Multiplication by two large numbers
+    BigInt large1({0xFFFFFFFFUL, 0x2UL}); // 2^64 + 2^32 - 1
+    BigInt large2(2UL);
+    result = large1 * large2;
+    check_contents(result, {0xFFFFFFFEUL, 0x5UL}); // Should carry
+    ASSERT(!result.is_negative());
+
+    // Multiplication by a negative number
+    BigInt negative_one(1UL, true);
+    result = negative_one * objs->nine;
+    check_contents(result, {9UL});
+    ASSERT(result.is_negative());
+}
+
+
+// Additional tests for division
+void test_division(TestObjs *objs) {
+    // Division resulting in a fraction 
+    BigInt result = objs->nine / objs->two;
+    check_contents(result, {4UL}); // 9 / 2 = 4.5 = 4
+    ASSERT(!result.is_negative());
+
+    // Negative number
+    BigInt negative_nine(9UL, true);
+    result = negative_nine / objs->two;
+    check_contents(result, {4UL}); // -9 / 2 = -4.5 = -4
+    ASSERT(result.is_negative());
+
+    // Larger divisor than dividend
+    BigInt large_divisor(100UL);
+    result = objs->nine / large_divisor;
+    check_contents(result, {0UL}); 
+    ASSERT(!result.is_negative());
+}
+
+void test_division_larger_numbers(TestObjs *objs) {
+  {
+    BigInt left({0x5a1f7b06e95d205bUL, 0x16bef383084c9bf5UL, 0x6bfd5cb9a0cfa403UL, 0xbb47e519c0ffc392UL, 0xc8c47a8ab9cc20afUL, 0x30302fb07ef81d25UL, 0x8b8bcb6df3f72911UL, 0x3de679169dc89703UL, 0x48f52b428f255e1dUL, 0xd623c2e8a460f5beUL, 0xae2df81a84808054UL, 0xcfb038910d158d63UL, 0xcf97bc9UL});
+    BigInt right({0xe1d191b09fd571e7UL, 0xd6e34973337d88fdUL, 0x7235628c33211b03UL, 0xe0bbc74b5d7fe26aUL, 0x8ad5d1b254c5d7dfUL, 0x5fc278b4b85b5a7UL});
+    BigInt result = left / right;
+    check_contents(result, {0x4UL});
+    ASSERT(!result.is_negative());
+  }
+
+}
+
+// Test the edge cases for division
+void test_division_edge_cases(TestObjs *objs) {
+    // Division by 0
+    try {
+        BigInt bad = objs->one / objs->zero;
+        FAIL("Divide by 0 didn't throw an exception as expected.");
+    } catch (std::invalid_argument &ex) {
+        // Made it here, then we successfully handled division by 0.
+    }
+
+    // Division by a divisor > dividend
+    BigInt bad = objs->one / objs->two;
+    ASSERT(bad == BigInt());
+}
+
+// Test to_dec for large positive
+void test_large_positive_to_dec(TestObjs *objs) {
+    BigInt largePositive({0xFFFFFFFFFFFFFFFFUL, 0x1UL}); 
+    std::string expected = "18446744073709551615";
+    ASSERT(largePositive.to_dec() == expected);
+}
+
+// Test to_dec for large negative
+void test_large_negative_to_dec(TestObjs *objs) {
+    BigInt largeNegative({0xFFFFFFFFFFFFFFFFUL, 0x1UL}, true); 
+    std::string expected = "-18446744073709551615"; 
+    ASSERT(largeNegative.to_dec() == expected);
 }
